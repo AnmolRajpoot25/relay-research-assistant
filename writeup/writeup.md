@@ -33,17 +33,17 @@ In research intelligence and enterprise AI, hallucinated facts and fabricated ci
 ### Real Service Limits & Characterization
 Groq's hosted free-tier API provides low-latency inference on LPUs (Language Processing Units) with strict per-minute and per-day quotas. In our probing architecture (implemented in `run_real_measurements.py`), baseline limits were cataloged using official API console specifications and empirical probing probes:
 
-#### Table 1: Limits in the Real Service (Groq Free Tier)
+#### Table 1: Limits you found in the real service
 
-| Metric | Primary Model (`llama-3.3-70b-versatile`) | Fallback Model (`llama-3.1-8b-instant`) | Discovery Method |
+| Limit | Value you found | How you found it | Confidence (high, medium, low) |
 | :--- | :--- | :--- | :--- |
-| **Requests per minute (RPM)** | 30 RPM | 30 RPM | Response header: `x-ratelimit-limit-requests` |
-| **Tokens per minute (TPM)** | 12,000 TPM | 6,000 TPM | Response header: `x-ratelimit-limit-tokens` |
-| **Requests per day (RPD)** | 1,000 RPD | 14,400 RPD | Groq API console documentation |
-| **Tokens per day (TPD)** | 100,000 TPD | 500,000 TPD | Groq API console documentation |
-| **Requests in flight at once** | *Not measured / unstated in public docs* | *Not measured / unstated in public docs* | Unspecified in gateway headers |
-| **What it returns when limit hit** | HTTP 429 Too Many Requests (`rate_limit_exceeded`) | HTTP 429 Too Many Requests (`rate_limit_exceeded`) | Gateway error payload + `retry-after` header |
-| **Time until it recovers** | 1.0s – 3.0s (RPM) / Reset at 00:00 UTC (RPD) | 1.0s – 3.0s (RPM) / Reset at 00:00 UTC (RPD) | `x-ratelimit-reset-requests` sliding window |
+| **Requests per minute** | 30 RPM (both 70B & 8B) | Response header: `x-ratelimit-limit-requests` | High |
+| **Tokens per minute** | 12,000 TPM (`llama-3.3-70b`) / 6,000 TPM (`llama-3.1-8b`) | Response header: `x-ratelimit-limit-tokens` | High |
+| **Requests per day** | 1,000 RPD (`llama-3.3-70b`) / 14,400 RPD (`llama-3.1-8b`) | Groq API console documentation & console limits | High |
+| **Tokens per day** | 100,000 TPD (`llama-3.3-70b`) / 500,000 TPD (`llama-3.1-8b`) | Groq API console documentation & console limits | High |
+| **Requests in flight at once** | *Not measured / unstated in public docs* | Unstated in public API documentation or headers | Low |
+| **What it returns when a limit is hit** | HTTP 429 Too Many Requests (`rate_limit_exceeded`) | Direct gateway error payload + `retry-after` header | High |
+| **Time until it recovers** | 1.0s – 3.0s (per-minute) / Reset at 00:00 UTC (daily) | `x-ratelimit-reset-requests` sliding window | High |
 
 ### What the Stand-In Simulates and Leaves Out
 The stand-in service (`mock_service/mock_server.py`) operates as a local HTTP daemon mimicking Groq's exact OpenAI-compatible `/v1/chat/completions` API:
@@ -64,15 +64,15 @@ A comprehensive benchmark campaign was executed across 5 workload shapes plus 3 
 
 *Note on Percentile Population:* TTFT percentiles ($p50/p95/p99$) are computed across all requests that received streaming tokens (`first_token_ms > 0`). Total time percentiles are computed across all completed requests, including rate-limited rejections.
 
-### Table 2a: Latency, one row per load scenario
+### Table 2a: Latency, one row per load scenario (at least: steady, burst, sustained overload, per-minute limit halved, daily budget exhausted)
 
-| Scenario | Real or stand-in | Requests sent | First token p50 / p95 / p99 (ms) | Total time p50 / p95 / p99 (ms) |
-| :--- | :--- | :--- | :--- | :--- |
-| **steady_stand_in** | stand-in | 30 | 64.4 / 3286.6 / 3771.2 | 65.5 / 7132.6 / 8558.3 |
-| **sudden_burst** | stand-in | 40 | 64.4 / 2680.3 / 4247.6 | 66.1 / 7265.6 / 8556.6 |
-| **sustained_overload** | stand-in | 50 | 60.4 / 2130.5 / 3461.2 | 60.7 / 4675.6 / 9387.0 |
-| **per_minute_limit_halved**| stand-in | 30 | 58.4 / 67.5 / 755.6 | 60.9 / 5241.1 / 6191.3 |
-| **daily_budget_exhausted** | stand-in | 20 | 57.1 / 65.7 / 66.2 | 57.3 / 65.9 / 66.5 |
+| Scenario | Real or stand-in | Requests sent | Duration (s) | Offered rate (per min) | First token p50 / p95 / p99 (ms) | Total time p50 / p95 / p99 (ms) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **steady_stand_in** | stand-in | 30 | 75.0 | 24.0 | 64.4 / 3286.6 / 3771.2 | 65.5 / 7132.6 / 8558.3 |
+| **sudden_burst** | stand-in | 40 | 15.0 | 160.0 | 64.4 / 2680.3 / 4247.6 | 66.1 / 7265.6 / 8556.6 |
+| **sustained_overload** | stand-in | 50 | 50.0 | 60.0 | 60.4 / 2130.5 / 3461.2 | 60.7 / 4675.6 / 9387.0 |
+| **per_minute_limit_halved**| stand-in | 30 | 45.0 | 40.0 | 58.4 / 67.5 / 755.6 | 60.9 / 5241.1 / 6191.3 |
+| **daily_budget_exhausted** | stand-in | 20 | 15.0 | 80.0 | 57.1 / 65.7 / 66.2 | 57.3 / 65.9 / 66.5 |
 
 ### Table 2b: Outcomes, same rows
 

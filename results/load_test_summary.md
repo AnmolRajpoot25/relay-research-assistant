@@ -1,12 +1,12 @@
-### Table 2a: Latency, one row per load scenario
+### Table 2a: Latency, one row per load scenario (at least: steady, burst, sustained overload, per-minute limit halved, daily budget exhausted)
 
-| Scenario | Real or stand-in | Requests sent | First token p50 / p95 / p99 (ms) | Total time p50 / p95 / p99 (ms) |
-| :--- | :--- | :--- | :--- | :--- |
-| steady_stand_in | stand-in | 30 | 64.4 / 3286.6 / 3771.2 | 65.5 / 7132.6 / 8558.3 |
-| sudden_burst | stand-in | 40 | 64.4 / 2680.3 / 4247.6 | 66.1 / 7265.6 / 8556.6 |
-| sustained_overload | stand-in | 50 | 60.4 / 2130.5 / 3461.2 | 60.7 / 4675.6 / 9387.0 |
-| per_minute_limit_halved | stand-in | 30 | 58.4 / 67.5 / 755.6 | 60.9 / 5241.1 / 6191.3 |
-| daily_budget_exhausted | stand-in | 20 | 57.1 / 65.7 / 66.2 | 57.3 / 65.9 / 66.5 |
+| Scenario | Real or stand-in | Requests sent | Duration (s) | Offered rate (per min) | First token p50 / p95 / p99 (ms) | Total time p50 / p95 / p99 (ms) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| steady_stand_in | stand-in | 30 | 75.0 | 24.0 | 64.4 / 3286.6 / 3771.2 | 65.5 / 7132.6 / 8558.3 |
+| sudden_burst | stand-in | 40 | 15.0 | 160.0 | 64.4 / 2680.3 / 4247.6 | 66.1 / 7265.6 / 8556.6 |
+| sustained_overload | stand-in | 50 | 50.0 | 60.0 | 60.4 / 2130.5 / 3461.2 | 60.7 / 4675.6 / 9387.0 |
+| per_minute_limit_halved | stand-in | 30 | 45.0 | 40.0 | 58.4 / 67.5 / 755.6 | 60.9 / 5241.1 / 6191.3 |
+| daily_budget_exhausted | stand-in | 20 | 15.0 | 80.0 | 57.1 / 65.7 / 66.2 | 57.3 / 65.9 / 66.5 |
 
 ### Table 2b: Outcomes, same rows
 
