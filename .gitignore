@@ -1,0 +1,31 @@
+# Python build & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Environment secrets
+.env
+
+# Assessment & reviewer notes (private review docs)
+RECRUITER_ASSESSMENT.md
+*recruiter*
+*.recruiter*
+
+# IDE & Editor artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local runtime & checkpoints
+.backup_vault/
