@@ -1,0 +1,20 @@
+{
+  "model": "llama-3.3-70b-versatile",
+  "data_nature": "stand_in_calibration_baseline",
+  "documentation_reference": "Groq Console Rate Limits & Official API Documentation",
+  "published_limits": {
+    "requests_per_minute": 30,
+    "tokens_per_minute": 12000,
+    "requests_per_day": 1000,
+    "tokens_per_day": 100000,
+    "requests_in_flight_concurrent": "not measured / unstated in public docs",
+    "status_code_on_rate_limit": "HTTP 429 Too Many Requests",
+    "recovery_time": "1-3 seconds based on sliding-window retry-after header"
+  },
+  "calibrated_latency_distributions": {
+    "ttft_p50_ms": 280.0,
+    "ttft_p95_ms": 850.0,
+    "total_p50_ms": 1150.0,
+    "total_p95_ms": 3200.0
+  }
+}
